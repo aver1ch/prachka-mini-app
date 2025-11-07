@@ -27,26 +27,20 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	collection := db.Client.Database("prachka").Collection("users")
 
-	// проверяем, есть ли уже такой логин
-	count, _ := collection.CountDocuments(context.Background(), bson.M{"login": credentials.Login})
-	if count > 0 {
-		http.Error(w, "login exists", http.StatusBadRequest)
+	count, _ := collection.CountDocuments(context.Background(), bson.M{"login": credentials.Login, "password": credentials.Password})
+	if count < 0 {
+		http.Error(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
-	slog.Debug("Check the login and password")
-	if credentials.Login == "admin" && credentials.Password == "1234" {
-		slog.Debug("Login and password is valid")
-
-		slog.Debug("Cooking response")
-		response := map[string]string{
-			"token": "vovan",
-		}
-
-		slog.Debug("Sending response")
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+	slog.Debug("Cooking response")
+	response := map[string]string{
+		"token": "vovan",
 	}
 
-	http.Error(w, "invalid credentials", http.StatusUnauthorized)
+	slog.Debug("Sending response")
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+
+	return
 }
