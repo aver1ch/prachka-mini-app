@@ -1,9 +1,13 @@
 package handlers
 
 import (
+	"backend/internal/db"
+	"context"
 	"encoding/json"
 	"log/slog"
 	"net/http"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
@@ -21,16 +25,30 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	collection := db.Client.Database("prachka").Collection("users")
+
+	// проверяем, есть ли уже такой логин
+	count, _ := collection.CountDocuments(context.Background(), bson.M{"login": credentials.Login})
+	if count > 0 {
+		http.Error(w, "login exists", http.StatusBadRequest)
+		return
+	}
+
+	// добавляем пользователя
+	_, err := collection.InsertOne(context.Background(), credentials)
+	if err != nil {
+		http.Error(w, "db error", http.StatusInternalServerError)
+		return
+	}
+
 	slog.Debug("Login and password is valid\n Adding to database")
 
 	slog.Debug("Cooking response")
-	response := map[string]string{
-		"token": "good",
-	}
+	response := map[string]string{"token": "good"}
 
 	slog.Debug("Sending response")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 
-	http.Error(w, "invalid credentials", http.StatusUnauthorized)
+	return
 }

@@ -1,9 +1,13 @@
 package handlers
 
 import (
+	"backend/internal/db"
+	"context"
 	"encoding/json"
 	"log/slog"
 	"net/http"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -18,6 +22,15 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	slog.Debug("Pull login and password from request in LoginHandler function")
 	if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
 		http.Error(w, "invalid json", http.StatusBadRequest)
+		return
+	}
+
+	collection := db.Client.Database("prachka").Collection("users")
+
+	// проверяем, есть ли уже такой логин
+	count, _ := collection.CountDocuments(context.Background(), bson.M{"login": credentials.Login})
+	if count > 0 {
+		http.Error(w, "login exists", http.StatusBadRequest)
 		return
 	}
 
