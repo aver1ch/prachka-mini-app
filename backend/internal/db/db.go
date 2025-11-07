@@ -20,7 +20,6 @@ func Connect() (*mongo.Client, error) {
 		return nil, err
 	}
 
-	// Проверка соединения
 	if err := client.Ping(ctx, nil); err != nil {
 		return nil, err
 	}

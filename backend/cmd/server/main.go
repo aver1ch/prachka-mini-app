@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/internal/db"
 	"backend/internal/handlers"
 	"log/slog"
 	"net/http"
@@ -10,7 +11,8 @@ import (
 
 func main() {
 	slog.Info("Server starts")
-
+	slog.Info("Connection to database")
+	db.Connect()
 	distDir := "../frontend/dist"
 	fs := http.FileServer(http.Dir(distDir))
 
