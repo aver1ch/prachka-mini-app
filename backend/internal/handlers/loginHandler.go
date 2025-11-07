@@ -6,11 +6,6 @@ import (
 	"net/http"
 )
 
-type credentials struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
-}
-
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	slog.Debug("Check is request is POST in LoginHandler function")
 	if r.Method != http.MethodPost {
