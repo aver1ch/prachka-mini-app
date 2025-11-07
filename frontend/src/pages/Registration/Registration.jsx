@@ -8,17 +8,35 @@ function Registration() {
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
 
-    const Reg = () => {
-      if (login != "" && password != "") {
-        alert("Вы успешно зарегистрировались");
-        navigate("/mainpage");
-      } else {
-        alert("введите логин и пароль")
+    const handleRegister = async () => {
+      const res = await fetch("/reg", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ login, password })
+      });
+    
+      if (!res.ok) {
+        const err = await res.text();
+        alert("Ошибка: " + err);
+        return;
       }
+    
+      const data = await res.json();
+      console.log(data.token); // "good"
+      alert("Регистрация успешна!");
+      navigate("/login");
     };
+    
 
     return (
         <div className="login-wrap">
+
+        <header className="header">
+          <div className="container">
+            <img src="/polylogo.svg" alt="PolyLogo" className="logo" />
+          </div>
+        </header>
+
         <h1 className="login-title">Регистрация</h1>
   
         <input
@@ -37,11 +55,12 @@ function Registration() {
           onChange={(e) => setPassword(e.target.value)}
         />
   
-        <button className="login-btn" onClick={Reg}>
+        <button className="btn" onClick={handleRegister}>
           Зарегистрироваться
         </button>
 
-        <button className="login-btn" onClick={() => navigate("/login")}>
+
+        <button className="btn" onClick={() => navigate("/login")}>
           Войти
         </button>
       </div>

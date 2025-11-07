@@ -5,22 +5,39 @@ import { useNavigate } from "react-router-dom";
 function Login() {
   const navigate = useNavigate();
 
-  const mylogin = "admin";
-  const mypassword = "1234";
-
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
 
-  const Log = () => {
-    if (login === mylogin && password === mypassword) {
-      navigate("/mainpage");
-    } else {
-      alert("Неверный логин/пароль");
+  const handleLogin = async () => {
+    const res = await fetch("/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ login, password })
+    });
+  
+    if (!res.ok) {
+      const err = await res.text();
+      alert("Ошибка: " + err);
+      return;
     }
+  
+    const data = await res.json();
+    console.log(data.token); // "vovan"
+    localStorage.setItem("token", data.token);
+    navigate("/mainpage");
   };
+  
+  
 
   return (
     <div className="login-wrap">
+
+      <header className="header">
+        <div className="container">
+          <img src="/polylogo.svg" alt="PolyLogo" className="logo" />
+        </div>
+      </header>
+
       <h1 className="login-title">Вход</h1>
 
       <input
@@ -39,11 +56,11 @@ function Login() {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button className="login-btn" onClick={Log}>
+      <button className="btn" onClick={handleLogin}>
         Войти
       </button>
 
-      <button className="login-btn" onClick={() => navigate("/registration")}>
+      <button className="btn" onClick={() => navigate("/registration")}>
         Зарегистрироваться
       </button>
     </div>
