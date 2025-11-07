@@ -13,9 +13,9 @@ function Login() {
 
   const Log = () => {
     if (login === mylogin && password === mypassword) {
-      alert("Успешный вход");
+      navigate("/mainpage");
     } else {
-      alert("Неверный логин или пароль");
+      alert("Неверный логин/пароль");
     }
   };
 
@@ -43,8 +43,8 @@ function Login() {
         Войти
       </button>
 
-      <button className="login-btn" onClick={() => navigate("/")}>
-        Назад
+      <button className="login-btn" onClick={() => navigate("/registration")}>
+        Зарегистрироваться
       </button>
     </div>
   );
